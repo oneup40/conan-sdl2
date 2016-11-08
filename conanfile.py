@@ -122,18 +122,23 @@ class SDLConan(ConanFile):
 
     def package_info(self):  
                 
-        self.cpp_info.libs = ["SDL2"]
+        self.cpp_info.libs = []
           
         if self.settings.os == "Windows":
-            self.cpp_info.libs.append("OpenGL32")
-            self.cpp_info.libs.append("SDL2main")
-            if self.settings.compiler == "Visual Studio":
+            if self.settings.compiler == "gcc":    #MinGW?
+                self.cpp_info.libs.append("mingw32")
+            elif self.settings.compiler == "Visual Studio":
                 # CFLAGS
                 self.cpp_info.cflags = ["/DWIN32", "/D_WINDOWS", "/W3"]
                 # EXTRA LIBS
                 self.cpp_info.libs.extend(["user32", "gdi32", "winmm", "imm32", "ole32",
                                                    "oleaut32", "version", "uuid"])
+
+            self.cpp_info.libs.append("SDL2main")
+            self.cpp_info.libs.append("SDL2")
+
         elif self.settings.os == "Macos":
+            self.cpp_info.libs.append("SDL2")
             if not self.options.shared:
                 self.cpp_info.libs.append("SDL2main")
                 self.cpp_info.libs.append("iconv")
@@ -153,6 +158,7 @@ class SDLConan(ConanFile):
                 self.cpp_info.sharedlinkflags = self.cpp_info.exelinkflags
                 
         elif self.settings.os == "Linux":
+            self.cpp_info.libs.append("SDL2")
             self.cpp_info.libs.append("GL")
             if not self.options.shared:
                 self.cpp_info.libs.append("SDL2main")
@@ -166,6 +172,8 @@ class SDLConan(ConanFile):
             self.cpp_info.libs.extend(["m", "dl", "rt"])
             # EXTRA_LDFLAGS
             self.cpp_info.libs.append("pthread")
+        else:
+            self.cpp_info.libs.append("SDL2")
 
     def has_gl_installed(self):
         if self.settings.os == "Linux":
